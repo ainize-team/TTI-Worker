@@ -1,6 +1,6 @@
 # TTI-Worker
 
-Serving Large Language Model Using FastAPI and Celery
+Serving Text To Image Model Using FastAPI and Celery
 
 ## For Developers
 
