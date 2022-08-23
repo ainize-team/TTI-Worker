@@ -1,47 +1,36 @@
-import json
 import os
-from typing import Dict
 
+import open_clip
 import torch
+from configs.config import model_settings
+from constants import CONFIG_FILE_NAME, MODEL_FILE_NAME
+from ldm.util import instantiate_from_config
 from loguru import logger
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from omegaconf import OmegaConf
 
 
 class TextToImageModel:
     def __init__(self):
-        self.tokenizer = None
+        self.clip_model = None
         self.model = None
+        self.preprocess = None
 
-    def load_model(self, model_path: str, use_fast: bool = True):
-        number_of_device = torch.cuda.device_count()
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=use_fast)
-
+    def load_model(self) -> None:
+        logger.info("Load Model")
+        config = OmegaConf.load(os.path.join(model_settings.model_path, CONFIG_FILE_NAME))
+        pl_sd = torch.load(os.path.join(model_settings.model_path, MODEL_FILE_NAME))
+        sd = pl_sd["state_dict"]
+        self.model = instantiate_from_config(config.model)
+        m, u = self.model.load_state_dict(sd, strict=False)
+        if len(m) > 0:
+            logger.warning(f"Missing Keys : {m}")
+        if len(u) > 0:
+            logger.warning(f"Unexpected Keys : {u}")
         if torch.cuda.is_available():
-            if number_of_device > 1:
-                with open(os.path.join(model_path, "layer_list.json"), "r") as f:
-                    layer_list = json.load(f)
-                n_layer = len(layer_list)
-                quotient, remainder = divmod(n_layer, number_of_device)
-
-                device_map: Dict[str, int] = {}
-                idx = 0
-                for i in range(number_of_device):
-                    for _ in range(quotient):
-                        device_map[layer_list[idx]] = i
-                        idx += 1
-                    if i >= number_of_device - remainder:
-                        device_map[layer_list[idx]] = i
-                        idx += 1
-
-                logger.info(f"Device Map : {device_map}")
-                self.model = AutoModelForCausalLM.from_pretrained(
-                    model_path, device_map=device_map, torch_dtype=torch.bfloat16
-                )
-            else:
-                logger.info("Load Model to Single GPU")
-                self.model = AutoModelForCausalLM.from_pretrained(
-                    model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True
-                ).cuda()
-        else:
-            self.model = AutoModelForCausalLM.from_pretrained(model_path)
+            self.model = self.model.half().cuda()
         self.model.eval()
+
+    def load_clip_model(self) -> None:
+        clip_model, _, preprocess = open_clip.create_model_and_transforms("ViT-B-32", pretrained="openai")
+        self.clip_model = clip_model
+        self.preprocess = preprocess
