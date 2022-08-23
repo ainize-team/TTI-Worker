@@ -32,7 +32,6 @@ def generate(task_id: str, data: Dict) -> None:
     redis.set(task_id, json.dumps(dict(response)))
     opt = argparse.Namespace(
         prompt=data.prompt,
-        outdir="latent-diffusion/outputs",
         ddim_steps=data.steps,
         ddim_eta=0,
         n_iter=1,
@@ -53,9 +52,7 @@ def generate(task_id: str, data: Dict) -> None:
         error_flag = True
     finally:
         clear_memory()
-    if error_flag:
-        pass
-    else:
+    if not error_flag:
         now = datetime.utcnow().replace(tzinfo=pytz.utc).timestamp()
         response.updated_at = now
         response.status = ResponseStatusEnum.COMPLETED

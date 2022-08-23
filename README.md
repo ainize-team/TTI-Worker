@@ -40,12 +40,12 @@ docker build -t celery-tti .
 ### Run docker container
 ```
 docker run -d --name {worker_container_name} 
---gpus='"device=0,1,2,3,4,5,6,7"' -e USE_FAST_TOKENIZER=False
+--gpus='"device=4,5,6,7"'
 -e BROKER_URI={broker_uri} -e REDIS_HOST=<redis_hostname> 
 -e REDIS_PORT=<redis_port> -e REDIS_DB=<redis_db> 
 -e REDIS_PASSWORD=<redis_password> -v {local-path}:/model 
-celery-llm
+celery-tti
 ```
 
 ### Test with FastAPI
-- Check our [LLM-FastAPI](https://github.com/ainize-team/LLM-FastAPI) Repo.
+- Check our [TTI-FastAPI](https://github.com/ainize-team/TTI-FastAPI) Repo.

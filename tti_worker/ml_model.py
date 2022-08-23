@@ -1,10 +1,11 @@
 import os
+from typing import Union
 
 import numpy as np
 import open_clip
 import torch
 from configs.config import model_settings
-from constants import CONFIG_FILE_NAME, MODEL_FILE_NAME
+from constants import CONFIG_FILE_NAME, MODEL_FILE_NAME, OUT_DIR
 from einops import rearrange
 from ldm.models.diffusion.ddim import DDIMSampler
 from ldm.models.diffusion.ddpm import LatentDiffusion
@@ -19,8 +20,11 @@ from torchvision.utils import make_grid
 class TextToImageModel:
     def __init__(self):
         self.clip_model = None
-        self.model: LatentDiffusion = None
+        self.model: Union[LatentDiffusion, None] = None
         self.preprocess = None
+        os.makedirs(OUT_DIR, exist_ok=True)
+        sample_path = os.path.join(OUT_DIR, "samples")
+        os.makedirs(sample_path, exist_ok=True)
 
     def load_model(self) -> None:
         logger.info("Load Model")
@@ -49,12 +53,9 @@ class TextToImageModel:
             sampler = PLMSSampler(self.model)
         else:
             sampler = DDIMSampler(self.model)
-        os.makedirs(opt.outdir, exist_ok=True)
-        outpath = opt.outdir
-        prompt = opt.prompt
 
-        sample_path = os.path.join(outpath, "samples")
-        os.makedirs(sample_path, exist_ok=True)
+        outpath = OUT_DIR
+        prompt = opt.prompt
 
         all_samples = list()
         all_samples_images = list()

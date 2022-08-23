@@ -1,5 +1,5 @@
-import configs.celery_config
 from celery import Celery
+from configs import celery_config
 from configs.config import celery_worker_settings, redis_settings
 from redis import Redis
 
@@ -10,7 +10,7 @@ app = Celery(
     backend=celery_worker_settings.backend_uri,
     include=["tasks"],
 )
-app.config_from_object(configs.celery_config)
+app.config_from_object(celery_config)
 redis = Redis(
     host=redis_settings.redis_host,
     port=redis_settings.redis_port,
