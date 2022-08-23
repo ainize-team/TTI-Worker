@@ -7,23 +7,10 @@ from loguru import logger
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
-class CausalLMHuggingfaceModel:
+class TextToImageModel:
     def __init__(self):
         self.tokenizer = None
         self.model = None
-
-    def load_model(self, model_path: str, use_fast: bool = True):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=use_fast)
-        if torch.cuda.is_available():
-            self.model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.float16).cuda()
-        else:
-            self.model = AutoModelForCausalLM.from_pretrained(model_path)
-        self.model.eval()
-
-
-class LargeLanguageModel(CausalLMHuggingfaceModel):
-    def __init__(self):
-        super(LargeLanguageModel, self).__init__()
 
     def load_model(self, model_path: str, use_fast: bool = True):
         number_of_device = torch.cuda.device_count()
