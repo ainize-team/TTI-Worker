@@ -21,6 +21,12 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+celery = "^5.2.7"
+redis = "4.3.4"
+pydantic = "^1.9.2"
+torch = "^1.12.1"
+loguru = "^0.6.0"
+transformers = "^4.21.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
