@@ -60,3 +60,6 @@ COPY ./tti_worker/ /app/
 EXPOSE 8000
 
 COPY ./start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+CMD ./start.sh
