@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.12.0-cuda11.3-cudnn8-devel
+FROM nvidia/cuda:10.2-cudnn8-runtime-ubuntu18.04
 
 # set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -50,9 +50,9 @@ RUN poetry install --no-dev
 ARG MODEL_URL="https://ommer-lab.com/files/latent-diffusion/nitro/txt2img-f8-large/model.ckpt"
 ARG CONFIG_URL="https://raw.githubusercontent.com/CompVis/latent-diffusion/main/configs/latent-diffusion/txt2img-1p4B-eval.yaml"
 RUN mkdir /app/model
-RUN wget --no-verbose --show-progress --progress=bar:force:noscroll -O /app/model/model.ckpt ${MODEL_URL}
+RUN  --no-verbose --show-progress --progress=bar:force:noscroll -O /app/model/model.ckpt ${MODEL_URL}
 RUN wget --no-verbose --show-progress --progress=bar:force:noscroll -O /app/model/config.yaml ${CONFIG_URL}
-
+wget
 COPY ./tti_worker/ /app/
 
 EXPOSE 8000

@@ -29,6 +29,7 @@ docker run --name redis -d -p 6379:6379 redis
 - Want to control Redis
   - `sudo apt install redis-tools` in local shell
 
+
 ## 3-1. Using docker
 ### Build docker file
 ```
@@ -49,3 +50,30 @@ celery-tti
 
 ### Test with FastAPI
 - Check our [TTI-FastAPI](https://github.com/ainize-team/TTI-FastAPI) Repo.
+
+
+### Test with local file
+```python
+import os
+from celery.result import AsyncResult
+from tasks import generate
+
+os.environ["broker_uri"] = "amqp://guest:guest@localhost:8080//"
+
+
+task = generate.delay("random_task_id", {
+  "prompt": "deer shaped lamp",
+  "outdir": "latent-diffusion/outputs",
+  "ddim_steps": 30,
+  "ddim_eta": 0,
+  "n_iter": 1,
+  "W": 256,
+  "H": 256,
+  "n_samples": 2,
+  "scale": 5,
+  "plms": True,
+})
+
+# Get task result
+print(task.get())
+```
