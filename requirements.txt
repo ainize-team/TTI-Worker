@@ -58,7 +58,6 @@ tensorboard-data-server==0.6.1; python_version >= "3.7"
 tensorboard-plugin-wit==1.8.1; python_version >= "3.7"
 tensorboard==2.10.0; python_version >= "3.7"
 tokenizers==0.12.1; python_full_version >= "3.7.0"
-torch==1.12.1; python_full_version >= "3.7.0"
 torchmetrics==0.9.3; python_version >= "3.7"
 torchvision==0.13.1; python_version >= "3.7"
 tqdm==4.64.0; python_full_version >= "3.7.0" and python_version >= "3.7" and (python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.7")
@@ -72,3 +71,4 @@ win32-setctime==1.1.0; sys_platform == "win32" and python_version >= "3.5"
 wrapt==1.14.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
 yarl==1.8.1; python_version >= "3.7"
 zipp==3.8.1; python_version < "3.10" and python_version >= "3.7"
+--find-links https://download.pytorch.org/whl/torch_stable.html torch==1.12.0+cu113

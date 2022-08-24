@@ -99,5 +99,6 @@ class TextToImageModel:
                     grid = make_grid(grid, nrow=2)
                     # to image
                     grid = 255.0 * rearrange(grid, "c h w -> h w c").cpu().numpy()
+
                     Image.fromarray(grid.astype(np.uint8)).save(os.path.join(outpath, f"{task_id}.png"))
                     return os.path.join(outpath, f"{task_id}.png")
