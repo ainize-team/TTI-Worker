@@ -40,6 +40,7 @@ class TextToImageModel:
         if torch.cuda.is_available():
             self.model = self.model.half().cuda()
         self.model.eval()
+        logger.info("Load Model Complete")
 
     def load_clip_model(self) -> None:
         clip_model, _, preprocess = open_clip.create_model_and_transforms("ViT-B-32", pretrained="openai")

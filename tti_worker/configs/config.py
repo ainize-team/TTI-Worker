@@ -3,7 +3,7 @@ from pydantic import BaseSettings, Field
 
 class CeleryWorkerSettings(BaseSettings):
     worker_name: str = "Celery Worker"
-    broker_uri: str
+    broker_uri: str = "amqp://guest:guest@localhost:5672//"
     backend_uri: str = "Auto Generate"
 
 

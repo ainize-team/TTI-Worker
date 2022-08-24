@@ -26,19 +26,19 @@ def load_model(**kwargs):
 
 
 @app.task(name="generate")
-def generate(task_id: str, data: Dict) -> None:
+def generate(task_id: str, data: Dict) -> str:
     now = datetime.utcnow().replace(tzinfo=pytz.utc).timestamp()
     response = ImageGenerationResponse(status=ResponseStatusEnum.ASSIGNED, updated_at=now)
     redis.set(task_id, json.dumps(dict(response)))
     opt = argparse.Namespace(
-        prompt=data.prompt,
-        ddim_steps=data.steps,
+        prompt=data["prompt"],
+        ddim_steps=data["ddim_steps"],
         ddim_eta=0,
         n_iter=1,
-        W=data.width,
-        H=data.height,
-        n_samples=int(data.images),
-        scale=data.diversity_scale,
+        W=data["W"],
+        H=data["H"],
+        n_samples=int(data["n_samples"]),
+        scale=data["scale"],
         plms=True,
     )
     error_flag = False
@@ -47,9 +47,11 @@ def generate(task_id: str, data: Dict) -> None:
     except ValueError as e:
         redis.set(task_id, json.dumps({"status_code": 422, "message": str(e)}))
         error_flag = True
+        return str(e)
     except Exception as e:
         redis.set(task_id, json.dumps({"status_code": 500, "message": str(e)}))
         error_flag = True
+        return str(e)
     finally:
         clear_memory()
     if not error_flag:
@@ -58,3 +60,4 @@ def generate(task_id: str, data: Dict) -> None:
         response.status = ResponseStatusEnum.COMPLETED
         logger.info(f"task_id: {task_id}, gen result: {response.result}")
         redis.set(task_id, json.dumps(dict(response)))
+        return "success"
