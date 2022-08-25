@@ -41,7 +41,7 @@ docker build -t celery-tti .
 ### Run docker container
 ```
 docker run -d --name {worker_container_name} 
---gpus='"device=4,5,6,7"'
+--gpus='"device=0"'
 -e BROKER_URI={broker_uri} -e REDIS_HOST=<redis_hostname> 
 -e REDIS_PORT=<redis_port> -e REDIS_DB=<redis_db> 
 -e REDIS_PASSWORD=<redis_password> -v {local-path}:/model 
@@ -50,30 +50,3 @@ celery-tti
 
 ### Test with FastAPI
 - Check our [TTI-FastAPI](https://github.com/ainize-team/TTI-FastAPI) Repo.
-
-
-### Test with local file
-```python
-import os
-from celery.result import AsyncResult
-from tasks import generate
-
-os.environ["broker_uri"] = "amqp://guest:guest@localhost:8080//"
-
-
-task = generate.delay("random_task_id", {
-  "prompt": "deer shaped lamp",
-  "outdir": "latent-diffusion/outputs",
-  "ddim_steps": 30,
-  "ddim_eta": 0,
-  "n_iter": 1,
-  "W": 256,
-  "H": 256,
-  "n_samples": 2,
-  "scale": 5,
-  "plms": True,
-})
-
-# Get task result
-print(task.get())
-```
