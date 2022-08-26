@@ -7,6 +7,7 @@ Serving Text To Image Model Using FastAPI and Celery
 1. install dev package.
 
 ```shell
+pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
@@ -44,7 +45,8 @@ docker run -d --name <worker_container_name>
 --gpus='"device=0"'
 -e BROKER_URI=<broker_uri> -e REDIS_HOST=<redis_hostname> 
 -e REDIS_PORT=<redis_port> -e REDIS_DB=<redis_db> 
--e REDIS_PASSWORD=<redis_password> -v <local-path>:/model 
+-e REDIS_PASSWORD=<redis_password> 
+-v <local-path>:/model 
 celery-tti
 ```
 
