@@ -8,7 +8,8 @@ class CeleryWorkerSettings(BaseSettings):
 
 
 class ModelSettings(BaseSettings):
-    model_path: str = "./model"
+    model_name_or_path: str = "./model"
+    model_output_path: str = "./outputs"
 
 
 class RedisSettings(BaseSettings):
