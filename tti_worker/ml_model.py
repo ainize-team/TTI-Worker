@@ -50,7 +50,7 @@ class TextToImageModel:
         else:
             generator = torch.manual_seed(data.seed)
             images: List[Image.Image] = self.diffusion_pipeline(
-                prompt=ImageGenerationRequest.prompt,
+                prompt=[data.prompt] * data.images,
                 generator=generator,
                 height=data.height,
                 width=data.width,
