@@ -1,4 +1,3 @@
-# FROM nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu18.04
 FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
 # set environment variables
 ENV PYTHONUNBUFFERED=1 \

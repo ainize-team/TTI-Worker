@@ -2,3 +2,9 @@ black
 flake8
 isort
 pre-commit
+
+
+black==22.6.0
+flake8==5.0.4
+isort==5.10.1
+pre-commit==2.20.0
