@@ -1,6 +1,7 @@
 import base64
 import json
 from datetime import datetime
+from functools import partialmethod
 from typing import Dict
 
 import pytz
@@ -9,6 +10,7 @@ from enums import ResponseStatusEnum
 from loguru import logger
 from ml_model import TextToImageModel
 from schemas import ImageGenerationRequest, ImageGenerationResponse
+from tqdm import tqdm
 from utils import clear_memory
 from worker import app, redis
 
@@ -18,6 +20,7 @@ tti = TextToImageModel()
 
 @celeryd_init.connect
 def load_model(**kwargs):
+    tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
     logger.info("Start loading model...")
     tti.load_model()
     tti.load_clip_model()

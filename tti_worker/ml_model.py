@@ -14,11 +14,12 @@ class TextToImageModel:
         self.clip_model = None
         self.model: Union[DiffusionPipeline, None] = None
         os.makedirs(model_settings.model_output_path, exist_ok=True)
+        self.load_model()
 
     def load_model(self) -> None:
         if torch.cuda.is_available():
             self.diffusion_pipeline = DiffusionPipeline.from_pretrained(
-                model_settings.model_name_or_path, torch_dtype=torch.bfloat16
+                model_settings.model_name_or_path, torch_dtype=torch.float16
             ).to("cuda")
         else:
             self.diffusion_pipeline = DiffusionPipeline.from_pretrained(model_settings.model_name_or_path)
