@@ -54,9 +54,7 @@ def generate(task_id: str, data: Dict) -> str:
         redis.set(task_id, json.dumps(dict(response)))
     except ValueError as e:
         redis.set(task_id, json.dumps({"status_code": 422, "message": str(e)}))
-        return str(e)
     except Exception as e:
         redis.set(task_id, json.dumps({"status_code": 500, "message": str(e)}))
-        return str(e)
     finally:
         clear_memory()

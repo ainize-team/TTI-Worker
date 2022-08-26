@@ -25,15 +25,15 @@ class TextToImageModel:
             self.diffusion_pipeline = DiffusionPipeline.from_pretrained(model_settings.model_name_or_path)
 
     def generate(self, task_id: str, data: ImageGenerationRequest) -> str:
-        def make_grid(imgaes: List[Image.Image]):
+        def make_grid(images: List[Image.Image]):
             rows = 1
             cols = len(images)
             if len(images) == 4:
                 rows = 2
                 cols = 2
-            w, h = imgaes[0].size
+            w, h = images[0].size
             grid = Image.new("RGB", size=(cols * w, rows * h))
-            for i, img in enumerate(imgaes):
+            for i, img in enumerate(images):
                 grid.paste(img, box=(i % cols * w, i // cols * h))
             return grid
 
