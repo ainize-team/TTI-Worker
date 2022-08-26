@@ -21,13 +21,11 @@ def load_model(**kwargs):
     logger.info("Start loading model...")
     tti.load_model()
     tti.load_clip_model()
-
     logger.info("Loading model is done!")
 
 
 @app.task(name="generate")
 def generate(task_id: str, data: Dict) -> str:
-    print("generate start")
     now = datetime.utcnow().replace(tzinfo=pytz.utc).timestamp()
     response = ImageGenerationResponse(status=ResponseStatusEnum.ASSIGNED, updated_at=now)
     redis.set(task_id, json.dumps(dict(response)))

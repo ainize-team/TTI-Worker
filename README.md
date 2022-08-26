@@ -7,7 +7,7 @@ Serving Text To Image Model Using FastAPI and Celery
 1. install dev package.
 
 ```shell
-poetry install
+pip install -r requirements-dev.txt
 ```
 
 2. install pre-commit.

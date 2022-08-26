@@ -27,7 +27,6 @@ class TextToImageModel:
         os.makedirs(sample_path, exist_ok=True)
 
     def load_model(self) -> None:
-        logger.info("Load Model")
         config = OmegaConf.load(os.path.join(model_settings.model_path, CONFIG_FILE_NAME))
         pl_sd = torch.load(os.path.join(model_settings.model_path, MODEL_FILE_NAME))
         sd = pl_sd["state_dict"]
@@ -40,7 +39,6 @@ class TextToImageModel:
         if torch.cuda.is_available():
             self.model = self.model.half().cuda()
         self.model.eval()
-        logger.info("Load Model Complete")
 
     def load_clip_model(self) -> None:
         clip_model, _, preprocess = open_clip.create_model_and_transforms("ViT-B-32", pretrained="openai")
