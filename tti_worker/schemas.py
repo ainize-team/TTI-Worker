@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, Union
 
 from enums import ResponseStatusEnum
 from pydantic import BaseModel, Field, HttpUrl
@@ -26,6 +26,6 @@ class Error(BaseModel):
 
 class ImageGenerationResponse(BaseModel):
     status: ResponseStatusEnum = ResponseStatusEnum.PENDING
-    paths: Union[List[HttpUrl], None] = None
+    paths: Union[Dict[str, HttpUrl], None] = None
     error: Union[None, Error] = None
     updated_at: float = 0.0

@@ -36,14 +36,15 @@ def update_response(task_id: str, response: ImageGenerationResponse):
 
 def upload_output_images(task_id: str, output_path: str):
     app_name = firebase_settings.app_name
-    paths = []
+    paths = {}
     bucket = storage.bucket()
     for filename in os.listdir(output_path):
+        fn = os.path.splitext(filename)[0]
         blob = bucket.blob(f"{app_name}/results/{task_id}/{filename}")
         blob.upload_from_filename(os.path.join(output_path, filename))
         blob.make_public()
         path = blob.public_url
-        paths.append(path)
+        paths[fn] = path
 
     return paths
 
