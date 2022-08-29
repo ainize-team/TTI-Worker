@@ -36,10 +36,16 @@ def generate(task_id: str, data: Dict) -> str:
     user_request: ImageGenerationRequest = ImageGenerationRequest(**data)
     save_task_data(task_id, user_request, response)
     try:
-        output_path = tti.generate(task_id, user_request)
-        signed_paths = upload_output_images(task_id, output_path)
+        output_path, filter_results = tti.generate(task_id, user_request)
+        urls = upload_output_images(task_id, output_path)  # {0: ~~~, 1: ~~~, grid: ~~~}
+        response.results = {}
+        for i in urls.keys():
+            result = {}
+            result["url"] = urls[i]
+            if i != "grid":
+                result["is_filtered"] = filter_results[int(i) - 1]
+            response.results[i] = result
         response.status = ResponseStatusEnum.COMPLETED
-        response.paths = signed_paths
         response.updated_at = get_now_timestamp()
         update_response(task_id, response)
         remove_output_images(output_path)

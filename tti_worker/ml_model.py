@@ -40,23 +40,27 @@ class TextToImageModel:
         if torch.cuda.is_available():
             generator = torch.cuda.manual_seed(data.seed)
             with autocast("cuda"):
-                images: List[Image.Image] = self.diffusion_pipeline(
+                result = self.diffusion_pipeline(
                     prompt=[data.prompt] * data.images,
                     generator=generator,
                     height=data.height,
                     width=data.width,
                     num_inference_steps=data.steps,
-                )["sample"]
+                )
+                images: List[Image.Image] = result["sample"]
+                filter_results: List[bool] = result["nsfw_content_detected"]
             torch.cuda.empty_cache()
         else:
             generator = torch.manual_seed(data.seed)
-            images: List[Image.Image] = self.diffusion_pipeline(
+            result = self.diffusion_pipeline(
                 prompt=[data.prompt] * data.images,
                 generator=generator,
                 height=data.height,
                 width=data.width,
                 num_inference_steps=data.steps,
-            )["sample"]
+            )
+            images: List[Image.Image] = result["sample"]
+            filter_results: List[bool] = result["nsfw_content_detected"]
 
         output_path = os.path.join(model_settings.model_output_path, task_id)
         os.makedirs(output_path, exist_ok=True)
@@ -66,4 +70,4 @@ class TextToImageModel:
         for i in range(data.images):
             images[i].save(os.path.join(output_path, f"{i + 1}.png"))
 
-        return output_path
+        return output_path, filter_results

@@ -24,8 +24,13 @@ class Error(BaseModel):
     error_message: str
 
 
+class Result(BaseModel):
+    url: HttpUrl
+    is_filtered: bool
+
+
 class ImageGenerationResponse(BaseModel):
     status: ResponseStatusEnum = ResponseStatusEnum.PENDING
-    paths: Union[Dict[str, HttpUrl], None] = None
+    results: Dict[str, Result] = None
     error: Union[None, Error] = None
     updated_at: float = 0.0
