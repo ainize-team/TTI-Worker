@@ -1,18 +1,22 @@
-import base64
-import json
-from datetime import datetime
 from functools import partialmethod
 from typing import Dict
 
-import pytz
 from celery.signals import celeryd_init
 from enums import ResponseStatusEnum
 from loguru import logger
 from ml_model import TextToImageModel
-from schemas import ImageGenerationRequest, ImageGenerationResponse
+from schemas import ImageGenerationErrorResponse, ImageGenerationRequest, ImageGenerationResponse
 from tqdm import tqdm
-from utils import clear_memory
-from worker import app, redis
+from utils import (
+    clear_memory,
+    get_now_timestamp,
+    remove_output_images,
+    save_output_images,
+    save_task_data,
+    update_error_message,
+    update_response,
+)
+from worker import app
 
 
 tti = TextToImageModel()
@@ -29,32 +33,28 @@ def load_model(**kwargs):
 
 @app.task(name="generate")
 def generate(task_id: str, data: Dict) -> str:
-    now = datetime.utcnow().replace(tzinfo=pytz.utc).timestamp()
+    now = get_now_timestamp()
     response = ImageGenerationResponse(status=ResponseStatusEnum.ASSIGNED, updated_at=now)
-    redis.set(task_id, json.dumps(dict(response)))
-    user_request: ImageGenerationRequest = ImageGenerationRequest(
-        prompt=data["prompt"],
-        steps=data["steps"],
-        width=data["width"],
-        height=data["height"],
-        images=data["images"],
-        guidance_scale=data["guidance_scale"],
-    )
+    user_request: ImageGenerationRequest = ImageGenerationRequest(**data)
+    save_task_data(task_id, user_request, response)
     try:
-        # TODO: remove this code
-        grid_image_path = tti.generate(task_id, user_request)
-        with open(grid_image_path, "rb") as f:
-            data = f.read()
-        base64_str = base64.b64encode(data).decode("utf-8")
-        now = datetime.utcnow().replace(tzinfo=pytz.utc).timestamp()
+        output_path = tti.generate(task_id, user_request)
+        save_output_images(task_id, output_path)
+        now = get_now_timestamp()
         response.updated_at = now
         response.status = ResponseStatusEnum.COMPLETED
-        response.result = base64_str
         logger.info(f"task_id: {task_id} is done")
-        redis.set(task_id, json.dumps(dict(response)))
+        update_response(task_id, response)
+        remove_output_images(output_path)
     except ValueError as e:
-        redis.set(task_id, json.dumps({"status_code": 422, "message": str(e)}))
+        error_response = ImageGenerationErrorResponse(
+            status_code=422, status=ResponseStatusEnum.ERROR, message=str(e), updated_at=now
+        )
+        update_error_message(task_id, error_response)
     except Exception as e:
-        redis.set(task_id, json.dumps({"status_code": 500, "message": str(e)}))
+        error_response = ImageGenerationErrorResponse(
+            status_code=422, status=ResponseStatusEnum.ERROR, message=str(e), updated_at=now
+        )
+        update_error_message(task_id, error_response)
     finally:
         clear_memory()

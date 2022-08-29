@@ -65,4 +65,5 @@ class TextToImageModel:
         grid_image.save(os.path.join(output_path, "grid.png"))
         for i in range(data.images):
             images[i].save(os.path.join(output_path, f"{i + 1}.png"))
-        return os.path.join(output_path, "grid.png")
+
+        return output_path
