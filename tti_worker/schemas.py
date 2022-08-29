@@ -1,5 +1,7 @@
+from typing import List, Union
+
 from enums import ResponseStatusEnum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class ImageGenerationRequest(BaseModel):
@@ -17,13 +19,13 @@ class ImageGenerationRequest(BaseModel):
     guidance_scale: float = Field(7.5, ge=0, le=50, description="how much the prompt will influence the results")
 
 
+class Error(BaseModel):
+    status_code: int
+    error_message: str
+
+
 class ImageGenerationResponse(BaseModel):
     status: ResponseStatusEnum = ResponseStatusEnum.PENDING
-    updated_at: float = 0.0
-
-
-class ImageGenerationErrorResponse(BaseModel):
-    status_code: int
-    status: ResponseStatusEnum = ResponseStatusEnum.ERROR
-    message: str
+    paths: Union[List[HttpUrl], None] = None
+    error: Union[None, Error] = None
     updated_at: float = 0.0

@@ -7,7 +7,7 @@ import pytz
 import torch
 from configs.config import firebase_settings
 from firebase_admin import db, storage
-from schemas import ImageGenerationErrorResponse, ImageGenerationRequest, ImageGenerationResponse
+from schemas import ImageGenerationRequest, ImageGenerationResponse
 
 
 def clear_memory() -> None:
@@ -28,21 +28,24 @@ def save_task_data(task_id: str, user_request: ImageGenerationRequest, response:
 
 
 def update_response(task_id: str, response: ImageGenerationResponse):
+    if response.error is not None:
+        response.error = dict(response.error)
     app_name = firebase_settings.app_name
     db.reference(app_name).child(task_id).update(dict(response))
 
 
-def update_error_message(task_id: str, error_response: ImageGenerationErrorResponse):
+def upload_output_images(task_id: str, output_path: str):
     app_name = firebase_settings.app_name
-    db.reference(app_name).child(task_id).update(dict(error_response))
-
-
-def save_output_images(task_id: str, output_path: str):
-    app_name = firebase_settings.app_name
+    paths = []
     bucket = storage.bucket()
     for filename in os.listdir(output_path):
         blob = bucket.blob(f"{app_name}/results/{task_id}/{filename}")
-        blob.upload_from_filename(filename)
+        blob.upload_from_filename(os.path.join(output_path, filename))
+        blob.make_public()
+        path = blob.public_url
+        paths.append(path)
+
+    return paths
 
 
 def remove_output_images(output_path: str):
