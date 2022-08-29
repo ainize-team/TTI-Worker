@@ -1,7 +1,7 @@
-from typing import Union
+from typing import Dict, Union
 
 from enums import ResponseStatusEnum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class ImageGenerationRequest(BaseModel):
@@ -13,13 +13,19 @@ class ImageGenerationRequest(BaseModel):
         default=45, ge=1, le=50, description="more steps can increase quality but will take longer to generate"
     )
     seed: int = Field(default=1, ge=0, le=2147483647)
-    width: int = Field(default=512, ge=32, le=1024)
-    height: int = Field(default=512, ge=32, le=1024)
+    width: int = Field(default=512, ge=32, le=512)
+    height: int = Field(default=512, ge=32, le=512)
     images: int = Field(2, ge=1, le=4, description="How many images you wish to generate")
     guidance_scale: float = Field(7.5, ge=0, le=50, description="how much the prompt will influence the results")
 
 
+class Error(BaseModel):
+    status_code: int
+    error_message: str
+
+
 class ImageGenerationResponse(BaseModel):
     status: ResponseStatusEnum = ResponseStatusEnum.PENDING
+    paths: Union[Dict[str, HttpUrl], None] = None
+    error: Union[None, Error] = None
     updated_at: float = 0.0
-    result: Union[str, None] = None
