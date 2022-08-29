@@ -37,11 +37,9 @@ docker run -d --name <worker_container_name>
 --gpus='"device=0"' -e BROKER_URI=<broker_uri> 
 -e CRED_PATH=<firebase_credential_json_path> 
 -e DATABASE_URL=<firebase_realtime_database_url> 
--e STORAGE_BUCKET=<firebase_storage_url> -v <local-path>:/model 
+-e STORAGE_BUCKET=<firebase_storage_url> -v <local-path>:/app/model 
 celery-tti
 ```
 
 ### Test with FastAPI
 - Check our [TTI-FastAPI](https://github.com/ainize-team/TTI-FastAPI) Repo.
-
-docker run -d --name tti-celery-test -e BROKER_URI=amqp://guest:guest@172.17.0.1:5672// -e CRED_PATH=/app/configs/cred.json -e DATABASE_URL=https://fir-practice-ddbef-default-rtdb.firebaseio.com/ -e STORAGE_BUCKET='fir-practice-ddbef.appspot.com' -v /home/ubuntu/serving-tti/stable-diffusion-v1-4:/app/model tti-celery-test
