@@ -9,6 +9,14 @@ class StrEnum(str, Enum):
         return self.name
 
 
+class IntEnum(int, Enum):
+    def __repr__(self):
+        return str(self.value)
+
+    def __str__(self):
+        return str(self.value)
+
+
 class ResponseStatusEnum(StrEnum):
     PENDING: str = "pending"
     ASSIGNED: str = "assigned"
@@ -20,3 +28,8 @@ class EnvEnum(StrEnum):
     DEV: str = "dev"
     STAGGING: str = "stagging"
     PROD: str = "prod"
+
+
+class StatusCodeEnum(IntEnum):
+    UNPROCESSABLE_ENTITY = 422
+    INTERNAL_SERVER_ERROR = 500
