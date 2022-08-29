@@ -2,7 +2,7 @@ from functools import partialmethod
 from typing import Dict
 
 from celery.signals import celeryd_init
-from enums import ResponseStatusEnum, StatusCodeEnum
+from enums import ErrorStatusEnum, ResponseStatusEnum
 from loguru import logger
 from ml_model import TextToImageModel
 from schemas import Error, ImageGenerationRequest, ImageGenerationResponse
@@ -45,13 +45,13 @@ def generate(task_id: str, data: Dict) -> str:
         remove_output_images(output_path)
         logger.info(f"task_id: {task_id} is done")
     except ValueError as e:
-        error = Error(status_code=StatusCodeEnum.UNPROCESSABLE_ENTITY, error_message=str(e))
+        error = Error(status_code=ErrorStatusEnum.UNPROCESSABLE_ENTITY, error_message=str(e))
         error_response = ImageGenerationResponse(
             status=ResponseStatusEnum.ERROR, error=error, updated_at=get_now_timestamp()
         )
         update_response(task_id, error_response)
     except Exception as e:
-        error = Error(status_code=StatusCodeEnum.INTERNAL_SERVER_ERROR, error_message=str(e))
+        error = Error(status_code=ErrorStatusEnum.INTERNAL_SERVER_ERROR, error_message=str(e))
         error_response = ImageGenerationResponse(
             status=ResponseStatusEnum.ERROR, error=error, updated_at=get_now_timestamp()
         )

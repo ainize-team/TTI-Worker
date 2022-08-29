@@ -30,6 +30,6 @@ class EnvEnum(StrEnum):
     PROD: str = "prod"
 
 
-class StatusCodeEnum(IntEnum):
+class ErrorStatusEnum(IntEnum):
     UNPROCESSABLE_ENTITY = 422
     INTERNAL_SERVER_ERROR = 500
