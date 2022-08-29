@@ -22,16 +22,14 @@ def get_now_timestamp():
 
 def save_task_data(task_id: str, user_request: ImageGenerationRequest, response: ImageGenerationResponse):
     app_name = firebase_settings.app_name
-    task_data = dict(user_request)
-    task_data.update(dict(response))
-    db.reference(app_name).child(task_id).set(dict(task_data))
+    task_data = user_request.dict()
+    task_data.update(response.dict())
+    db.reference(app_name).child(task_id).set(task_data.dict())
 
 
 def update_response(task_id: str, response: ImageGenerationResponse):
-    if response.error is not None:
-        response.error = dict(response.error)
     app_name = firebase_settings.app_name
-    db.reference(app_name).child(task_id).update(dict(response))
+    db.reference(app_name).child(task_id).update(response.dict())
 
 
 def upload_output_images(task_id: str, output_path: str):
