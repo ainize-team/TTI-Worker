@@ -48,7 +48,10 @@ class TextToImageModel:
                     num_inference_steps=data.steps,
                 )
                 images: List[Image.Image] = result["sample"]
-                filter_results: List[bool] = result["nsfw_content_detected"]
+                if "nsfw_content_detected" in result:
+                    filter_results: List[bool] = result["nsfw_content_detected"]
+                else:
+                    filter_results: List[bool] = [False] * len(images)
             torch.cuda.empty_cache()
         else:
             generator = torch.manual_seed(data.seed)
@@ -60,7 +63,10 @@ class TextToImageModel:
                 num_inference_steps=data.steps,
             )
             images: List[Image.Image] = result["sample"]
-            filter_results: List[bool] = result["nsfw_content_detected"]
+            if "nsfw_content_detected" in result:
+                filter_results: List[bool] = result["nsfw_content_detected"]
+            else:
+                filter_results: List[bool] = [False] * len(images)
 
         output_path = os.path.join(model_settings.model_output_path, task_id)
         os.makedirs(output_path, exist_ok=True)
