@@ -2,7 +2,7 @@ celery==5.2.7
 pydantic==1.9.2
 loguru==0.6.0
 torch==1.12.1
-transformers==4.21.1
+transformers==4.21.2
 diffusers==0.2.4
 torchvision==0.13.1
 firebase-admin==5.3.0
