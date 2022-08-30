@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 
 from enums import ResponseStatusEnum
 from pydantic import BaseModel, Field, HttpUrl
@@ -24,13 +24,13 @@ class Error(BaseModel):
     error_message: str
 
 
-class Result(BaseModel):
+class ImageGenerationResult(BaseModel):
     url: HttpUrl
-    is_filtered: bool
+    is_filtered: Optional[bool]
 
 
 class ImageGenerationResponse(BaseModel):
     status: ResponseStatusEnum = ResponseStatusEnum.PENDING
-    results: Dict[str, Result] = None
+    results: Dict[str, ImageGenerationResult] = None
     error: Union[None, Error] = None
     updated_at: float = 0.0
