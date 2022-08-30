@@ -33,10 +33,11 @@ docker build -t celery-tti .
 
 ### Run docker container
 ```
-docker run -d --name <worker_container_name>
---gpus='"device=0"' -e BROKER_URI=<broker_uri> 
--e DATABASE_URL=<firebase_realtime_database_url> 
--e STORAGE_BUCKET=<firebase_storage_url>  -v <firebase_credential_dir_path>:/app/key-v <local-path>:/app/model 
+docker run -d --name <worker_container_name> \
+--gpus='"device=0"' -e BROKER_URI=<broker_uri> \
+-e DATABASE_URL=<firebase_realtime_database_url> \
+-e STORAGE_BUCKET=<firebase_storage_url> \
+-v <firebase_credential_dir_path>:/app/key-v <local-path>:/app/model \
 celery-tti
 ```
 
