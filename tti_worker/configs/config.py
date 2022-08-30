@@ -13,7 +13,7 @@ class ModelSettings(BaseSettings):
 
 
 class FirebaseSettings(BaseSettings):
-    cred_path: str
+    cred_path: str = "/app/key/serviceAccountKey.json"
     database_url: str
     storage_bucket: str
     app_name: str = "text-to-image"
