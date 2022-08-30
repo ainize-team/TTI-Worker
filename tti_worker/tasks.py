@@ -37,13 +37,15 @@ def generate(task_id: str, data: Dict) -> str:
     save_task_data(task_id, user_request, response)
     try:
         output_path, filter_results = tti.generate(task_id, user_request)
-        urls = upload_output_images(task_id, output_path)  # {0: ~~~, 1: ~~~, grid: ~~~}
+        urls = upload_output_images(task_id, output_path)
         response.results = {}
         for i in urls.keys():
             result = {}
             result["url"] = urls[i]
             if i != "grid":
                 result["is_filtered"] = filter_results[int(i) - 1]
+            else:
+                result["is_filtered"] = False
             response.results[i] = result
         response.status = ResponseStatusEnum.COMPLETED
         response.updated_at = get_now_timestamp()
