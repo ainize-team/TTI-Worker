@@ -45,6 +45,7 @@ class TextToImageModel:
                     generator=generator,
                     height=data.height,
                     width=data.width,
+                    guidance_scale=data.guidance_scale,
                     num_inference_steps=data.steps,
                 )
                 images: List[Image.Image] = result["sample"]
@@ -60,6 +61,7 @@ class TextToImageModel:
                 generator=generator,
                 height=data.height,
                 width=data.width,
+                guidance_scale=data.guidance_scale,
                 num_inference_steps=data.steps,
             )
             images: List[Image.Image] = result["sample"]
