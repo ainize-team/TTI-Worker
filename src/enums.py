@@ -33,3 +33,8 @@ class EnvEnum(StrEnum):
 class ErrorStatusEnum(IntEnum):
     UNPROCESSABLE_ENTITY = 422
     INTERNAL_SERVER_ERROR = 500
+
+
+class ModelClassNameEnums(StrEnum):
+    STABLE_DIFFUSION: str = "StableDiffusionPipeline"
+    LDM_TEXT_TO_IMAGE: str = "LDMTextToImagePipeline"

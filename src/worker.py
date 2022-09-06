@@ -1,8 +1,9 @@
 import firebase_admin
 from celery import Celery
+from firebase_admin import credentials
+
 from configs import celery_config
 from configs.config import celery_worker_settings, firebase_settings
-from firebase_admin import credentials
 
 
 app = Celery(

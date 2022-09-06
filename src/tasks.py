@@ -1,20 +1,14 @@
 from functools import partialmethod
-from typing import Dict
+from typing import Dict, List
 
 from celery.signals import celeryd_init
-from enums import ErrorStatusEnum, ResponseStatusEnum
 from loguru import logger
-from ml_model import TextToImageModel
-from schemas import Error, ImageGenerationRequest, ImageGenerationResponse
 from tqdm import tqdm
-from utils import (
-    clear_memory,
-    get_now_timestamp,
-    remove_output_images,
-    save_task_data,
-    update_response,
-    upload_output_images,
-)
+
+from enums import ErrorStatusEnum, ResponseStatusEnum
+from ml_model import TextToImageModel
+from schemas import Error, ImageGenerationRequest, ImageGenerationResponse, ImageGenerationWorkerOutput
+from utils import clear_memory, get_now_timestamp, save_task_data, update_response, upload_output_images
 from worker import app
 
 
@@ -36,21 +30,11 @@ def generate(task_id: str, data: Dict) -> str:
     user_request: ImageGenerationRequest = ImageGenerationRequest(**data)
     save_task_data(task_id, user_request, response)
     try:
-        output_path, filter_results = tti.generate(task_id, user_request)
-        urls = upload_output_images(task_id, output_path)
-        response.results = {}
-        for i in urls.keys():
-            result = {}
-            result["url"] = urls[i]
-            if i != "grid":
-                result["is_filtered"] = filter_results[int(i) - 1]
-            else:
-                result["is_filtered"] = False
-            response.results[i] = result
+        results: List[ImageGenerationWorkerOutput] = tti.generate(task_id, user_request)
+        response.results = upload_output_images(task_id, results)
         response.status = ResponseStatusEnum.COMPLETED
         response.updated_at = get_now_timestamp()
         update_response(task_id, response)
-        remove_output_images(output_path)
         logger.info(f"task_id: {task_id} is done")
     except ValueError as e:
         error = Error(status_code=ErrorStatusEnum.UNPROCESSABLE_ENTITY, error_message=str(e))

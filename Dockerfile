@@ -9,7 +9,7 @@ WORKDIR /app
 COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-COPY ./tti_worker/ /app/
+COPY ./src/ /app/
 
 EXPOSE 8000
 
