@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 from typing import Dict, List
 
-import pytz
 import torch
 from firebase_admin import db, storage
 
@@ -17,8 +16,8 @@ def clear_memory() -> None:
         torch.cuda.empty_cache()
 
 
-def get_now_timestamp():
-    return datetime.utcnow().replace(tzinfo=pytz.utc).timestamp()
+def get_now_timestamp() -> int:
+    return int(datetime.utcnow().timestamp()) * 1000
 
 
 def save_task_data(task_id: str, user_request: ImageGenerationRequest, response: ImageGenerationResponse):

@@ -45,4 +45,4 @@ class ImageGenerationResponse(BaseModel):
     status: ResponseStatusEnum = ResponseStatusEnum.PENDING
     results: Dict[str, ImageGenerationResult] = None
     error: Union[None, Error] = None
-    updated_at: float = 0.0
+    updated_at: int = 0
