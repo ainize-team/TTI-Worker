@@ -181,6 +181,7 @@ class TextToImageModel:
             if filter_results[i]:
                 images[i].save(os.path.join(output_path, f"{i + 1}_origin.png"))
                 images[i] = Image.new(mode="RGB", size=images[i].size)
+            images[i].save(os.path.join(output_path, f"{i + 1}.png"))
             result.append(
                 ImageGenerationWorkerOutput(
                     image_path=os.path.join(output_path, f"{i + 1}.png"),
