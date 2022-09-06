@@ -1,5 +1,7 @@
 from pydantic import BaseSettings, Field
 
+from enums import ModelClassNameEnums
+
 
 class CeleryWorkerSettings(BaseSettings):
     worker_name: str = "Celery Worker"
@@ -8,6 +10,7 @@ class CeleryWorkerSettings(BaseSettings):
 
 
 class ModelSettings(BaseSettings):
+    model_class_name: ModelClassNameEnums = ModelClassNameEnums.STABLE_DIFFUSION
     model_name_or_path: str = "./model"
     model_output_path: str = "./outputs"
     model_unit_memory: int = Field(default=3072, description="Memory Required to Create an Image 512 by 512")
