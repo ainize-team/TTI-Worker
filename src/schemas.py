@@ -27,6 +27,7 @@ class Error(BaseModel):
 
 class ImageGenerationWorkerOutput(BaseModel):
     image_path: str
+    origin_image_path: Optional[str]
     nsfw_content_detected: bool = False
     base_seed: int = Field(default=1, ge=0, le=2147483647)
     image_no: int = Field(default=0, ge=0, le=4, description="Image number, 0 is grid image")
@@ -34,6 +35,7 @@ class ImageGenerationWorkerOutput(BaseModel):
 
 class ImageGenerationResult(BaseModel):
     url: HttpUrl
+    origin_url: Optional[HttpUrl]
     is_filtered: Optional[bool]
     base_seed: int = Field(default=1, ge=0, le=2147483647)
     image_no: int = Field(default=0, ge=0, le=4, description="Image number, 0 is grid image")

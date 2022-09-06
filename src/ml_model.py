@@ -177,7 +177,19 @@ class TextToImageModel:
         os.makedirs(output_path, exist_ok=True)
 
         result: List[ImageGenerationWorkerOutput] = []
-
+        for i in range(data.images):
+            if filter_results[i]:
+                images[i].save(os.path.join(output_path, f"{i + 1}_origin.png"))
+                images[i] = Image.new(mode="RGB", size=images[i].size)
+            result.append(
+                ImageGenerationWorkerOutput(
+                    image_path=os.path.join(output_path, f"{i + 1}.png"),
+                    origin_image_path=os.path.join(output_path, f"{i + 1}_origin.png") if filter_results[i] else None,
+                    nsfw_content_detected=filter_results[i],
+                    base_seed=base_seed_list[i],
+                    image_no=image_no_list[i],
+                )
+            )
         grid_image: Image.Image = make_grid(images)
         grid_image.save(os.path.join(output_path, "grid.png"))
         result.append(
@@ -188,15 +200,5 @@ class TextToImageModel:
                 image_no=0,
             )
         )
-        for i in range(data.images):
-            images[i].save(os.path.join(output_path, f"{i + 1}.png"))
-            result.append(
-                ImageGenerationWorkerOutput(
-                    image_path=os.path.join(output_path, f"{i + 1}.png"),
-                    nsfw_content_detected=filter_results[i],
-                    base_seed=base_seed_list[i],
-                    image_no=image_no_list[i],
-                )
-            )
 
         return result
