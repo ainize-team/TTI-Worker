@@ -26,7 +26,7 @@ class TextToImageModel:
         else:
             self.diffusion_pipeline = DiffusionPipeline.from_pretrained(model_settings.model_name_or_path)
 
-    def generate(self, task_id: str, data: ImageGenerationRequest) -> Union[List[ImageGenerationWorkerOutput], None]:
+    def generate(self, task_id: str, data: ImageGenerationRequest) -> List[ImageGenerationWorkerOutput]:
         def make_grid(images: List[Image.Image]):
             rows = 1
             cols = len(images)
