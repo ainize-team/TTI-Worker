@@ -1,7 +1,8 @@
 import os
 from asyncio.log import logger
-from typing import List, Union
+from typing import List, Tuple, Union
 
+import numpy as np
 import nvgpu
 import torch
 import torch.nn as nn
@@ -38,7 +39,7 @@ class CustomStableDiffusionSafetyChecker(PreTrainedModel):
         self.register_buffer("special_care_embeds_weights", torch.ones(3))
 
     @torch.no_grad()
-    def forward(self, clip_input, images):
+    def forward(self, clip_input: torch.Tensor, images: np.ndarray) -> Tuple[np.ndarray, List[bool]]:
         pooled_output = self.vision_model(clip_input)[1]  # pooled_output
         image_embeds = self.visual_projection(pooled_output)
 
