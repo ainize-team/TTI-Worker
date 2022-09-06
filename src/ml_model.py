@@ -45,7 +45,7 @@ class TextToImageModel:
             estimated_memory_usage_per_image = (
                 model_settings.model_unit_memory * ((data.width / 512) ** 2) * ((data.height / 512) ** 2)
             )
-            if estimated_memory_usage_per_image * data.images < mem_free:
+            if estimated_memory_usage_per_image * data.images >= mem_free:
                 images: List[Image.Image] = []
                 filter_results: List[bool] = []
                 base_seed_list: List[int] = []
