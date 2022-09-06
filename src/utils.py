@@ -40,7 +40,7 @@ def upload_output_images(task_id: str, results: List[ImageGenerationWorkerOutput
     for result in results:
         image_path = result.image_path
         base_name = os.path.basename(image_path)
-        file_name = os.path.splitext(base_name)
+        file_name = os.path.splitext(base_name)[0]
 
         blob = bucket.blob(f"{app_name}/results/{task_id}/{base_name}")
         blob.upload_from_filename(image_path)
