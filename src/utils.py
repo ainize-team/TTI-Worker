@@ -1,5 +1,7 @@
 import gc
 import os
+import random
+import string
 from datetime import datetime
 from typing import Dict, List
 
@@ -14,6 +16,11 @@ def clear_memory() -> None:
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+
+
+def get_random_string(n: int = 16) -> str:
+    chars = string.ascii_letters + string.digits
+    return "".join(random.choice(chars) for _ in range(n))
 
 
 def get_now_timestamp() -> int:

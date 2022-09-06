@@ -13,7 +13,7 @@ from transformers import CLIPConfig, CLIPVisionModel, PreTrainedModel
 from configs.config import model_settings
 from enums import ModelClassNameEnums
 from schemas import ImageGenerationRequest, ImageGenerationWorkerOutput
-from utils import clear_memory
+from utils import clear_memory, get_random_string
 
 
 def cosine_distance(image_embeds, text_embeds):
@@ -178,14 +178,15 @@ class TextToImageModel:
 
         result: List[ImageGenerationWorkerOutput] = []
         for i in range(data.images):
+            random_string = get_random_string()
             if filter_results[i]:
-                images[i].save(os.path.join(output_path, f"{i + 1}_origin.png"))
+                images[i].save(os.path.join(output_path, f"{random_string}.png"))
                 images[i] = Image.new(mode="RGB", size=images[i].size)
             images[i].save(os.path.join(output_path, f"{i + 1}.png"))
             result.append(
                 ImageGenerationWorkerOutput(
                     image_path=os.path.join(output_path, f"{i + 1}.png"),
-                    origin_image_path=os.path.join(output_path, f"{i + 1}_origin.png") if filter_results[i] else None,
+                    origin_image_path=os.path.join(output_path, f"{random_string}.png") if filter_results[i] else None,
                     nsfw_content_detected=filter_results[i],
                     base_seed=base_seed_list[i],
                     image_no=image_no_list[i],
