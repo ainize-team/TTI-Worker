@@ -1,13 +1,14 @@
 import gc
 import os
-import shutil
 from datetime import datetime
+from typing import Dict, List
 
 import pytz
 import torch
-from configs.config import firebase_settings
 from firebase_admin import db, storage
-from schemas import ImageGenerationRequest, ImageGenerationResponse
+
+from configs.config import firebase_settings
+from schemas import ImageGenerationRequest, ImageGenerationResponse, ImageGenerationResult, ImageGenerationWorkerOutput
 
 
 def clear_memory() -> None:
@@ -32,20 +33,23 @@ def update_response(task_id: str, response: ImageGenerationResponse):
     db.reference(app_name).child(task_id).update(response.dict())
 
 
-def upload_output_images(task_id: str, output_path: str):
+def upload_output_images(task_id: str, results: List[ImageGenerationWorkerOutput]) -> Dict[str, ImageGenerationResult]:
     app_name = firebase_settings.app_name
-    urls = {}
+    ret = {}
     bucket = storage.bucket()
-    for filename in os.listdir(output_path):
-        fn = os.path.splitext(filename)[0]
-        blob = bucket.blob(f"{app_name}/results/{task_id}/{filename}")
-        blob.upload_from_filename(os.path.join(output_path, filename))
+    for result in results:
+        image_path = result.image_path
+        base_name = os.path.basename(image_path)
+        file_name = os.path.splitext(base_name)
+
+        blob = bucket.blob(f"{app_name}/results/{task_id}/{base_name}")
+        blob.upload_from_filename(image_path)
         blob.make_public()
         url = blob.public_url
-        urls[fn] = url
 
-    return urls
+        ret[file_name] = ImageGenerationResult(
+            url=url, is_filtered=result.nsfw_content_detected, base_seed=result.base_seed, image_no=result.image_no
+        )
 
-
-def remove_output_images(output_path: str):
-    shutil.rmtree(output_path)
+        os.remove(image_path)
+    return ret
