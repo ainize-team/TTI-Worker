@@ -58,9 +58,10 @@ def upload_output_images(task_id: str, results: List[ImageGenerationWorkerOutput
             origin_base_name = os.path.basename(origin_image_path)
 
             origin_blob = bucket.blob(f"{app_name}/results/{task_id}/{origin_base_name}")
-            origin_blob.upload_from_filename(image_path)
+            origin_blob.upload_from_filename(origin_image_path)
             origin_blob.make_public()
             origin_url = origin_blob.public_url
             ret[file_name].origin_url = origin_url
+            os.remove(origin_image_path)
 
     return ret
