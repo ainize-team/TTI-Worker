@@ -13,6 +13,7 @@ from transformers import CLIPConfig, CLIPVisionModel, PreTrainedModel
 from configs.config import model_settings
 from enums import ModelClassNameEnums
 from schemas import ImageGenerationRequest, ImageGenerationWorkerOutput
+from utils import clear_memory
 
 
 def cosine_distance(image_embeds, text_embeds):
@@ -148,12 +149,11 @@ class TextToImageModel:
                         filter_result: bool = result["nsfw_content_detected"][0]
                     else:
                         filter_result: bool = False
-                    torch.cuda.empty_cache()
                     images.append(image)
                     filter_results.append(filter_result)
                     base_seed_list.append(seed)
                     image_no_list.append(1)
-                torch.cuda.empty_cache()
+                clear_memory()
         else:
             generator = torch.cuda.manual_seed(data.seed)
             with autocast("cuda"):
@@ -172,7 +172,7 @@ class TextToImageModel:
                     filter_results: List[bool] = [False] * len(images)
                 base_seed_list: List[int] = [data.seed] * len(images)
                 image_no_list: List[int] = [no for no in range(1, data.images + 1)]
-            torch.cuda.empty_cache()
+            clear_memory()
         output_path = os.path.join(model_settings.model_output_path, task_id)
         os.makedirs(output_path, exist_ok=True)
 
