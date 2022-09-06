@@ -1,6 +1,4 @@
-from dataclasses import Field
-
-from pydantic import BaseSettings
+from pydantic import BaseSettings, Field
 
 
 class CeleryWorkerSettings(BaseSettings):
@@ -12,7 +10,7 @@ class CeleryWorkerSettings(BaseSettings):
 class ModelSettings(BaseSettings):
     model_name_or_path: str = "./model"
     model_output_path: str = "./outputs"
-    model_unit_memory: int = Field(default=3072, description="Memory Required to Create an Image 512 by 512 ")
+    model_unit_memory: int = Field(default=3072, description="Memory Required to Create an Image 512 by 512")
 
 
 class FirebaseSettings(BaseSettings):
