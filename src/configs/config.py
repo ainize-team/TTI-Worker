@@ -6,7 +6,6 @@ from enums import ModelClassNameEnums
 class CeleryWorkerSettings(BaseSettings):
     worker_name: str = "Celery Worker"
     broker_uri: str = "amqp://guest:guest@localhost:5672//"
-    backend_uri: str = "Auto Generate"
 
 
 class ModelSettings(BaseSettings):
@@ -20,7 +19,7 @@ class FirebaseSettings(BaseSettings):
     cred_path: str = "/app/key/serviceAccountKey.json"
     database_url: str
     storage_bucket: str
-    app_name: str = "text-to-image"
+    app_name: str = "text-to-art"
 
 
 celery_worker_settings = CeleryWorkerSettings()

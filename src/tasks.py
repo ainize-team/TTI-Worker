@@ -8,7 +8,7 @@ from tqdm import tqdm
 from enums import ErrorStatusEnum, ResponseStatusEnum
 from ml_model import TextToImageModel
 from schemas import Error, ImageGenerationRequest, ImageGenerationResponse, ImageGenerationWorkerOutput
-from utils import clear_memory, get_now_timestamp, save_task_data, update_response, upload_output_images
+from utils import clear_memory, get_now_timestamp, update_response, upload_output_images
 from worker import app
 
 
@@ -27,11 +27,11 @@ def load_model(**kwargs):
 @app.task(name="generate")
 def generate(task_id: str, data: Dict) -> str:
     response = ImageGenerationResponse(status=ResponseStatusEnum.ASSIGNED, updated_at=get_now_timestamp())
-    user_request: ImageGenerationRequest = ImageGenerationRequest(**data)
-    save_task_data(task_id, user_request, response)
+    update_response(task_id, response)
     try:
+        user_request: ImageGenerationRequest = ImageGenerationRequest(**data)
         results: List[ImageGenerationWorkerOutput] = tti.generate(task_id, user_request)
-        response.results = upload_output_images(task_id, results)
+        response.response = upload_output_images(task_id, results)
         response.status = ResponseStatusEnum.COMPLETED
         response.updated_at = get_now_timestamp()
         update_response(task_id, response)
