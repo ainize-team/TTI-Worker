@@ -37,9 +37,11 @@ docker build -t celery-tti .
 
 ### Create docker env file. Below is the sample
 
+```
 BROKER_URI=<broker_uri>
 DATABASE_URL=<firebase_realtime_database_url>
 STORAGE_BUCKET=<firebase_storage_url>
+```
 
 ### Run docker container
 
