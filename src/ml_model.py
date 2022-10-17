@@ -170,7 +170,7 @@ class TextToImageModel:
             random_string = get_random_string()
             if filter_results[i]:
                 images[i].save(os.path.join(output_path, f"{random_string}.png"))
-                images[i] = images[i].filter(ImageFilter.GaussianBlur(radius=35))
+                images[i] = images[i].filter(ImageFilter.GaussianBlur(radius=45))
             images[i].save(os.path.join(output_path, f"{i + 1}.png"))
             result.append(
                 ImageGenerationWorkerOutput(
