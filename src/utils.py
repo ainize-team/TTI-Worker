@@ -1,6 +1,7 @@
 import gc
 import os
 import random
+import shutil
 import string
 from datetime import datetime
 from typing import Dict, List
@@ -8,8 +9,11 @@ from typing import Dict, List
 import torch
 from firebase_admin import db, storage
 
-from configs.config import firebase_settings
-from schemas import ImageGenerationRequest, ImageGenerationResponse, ImageGenerationResult, ImageGenerationWorkerOutput
+from configs.config import firebase_settings, model_settings
+from schemas import ImageGenerationResponse, ImageGenerationResult, ImageGenerationWorkerOutput
+
+
+app_name = firebase_settings.app_name
 
 
 def clear_memory() -> None:
@@ -24,23 +28,14 @@ def get_random_string(n: int = 16) -> str:
 
 
 def get_now_timestamp() -> int:
-    return int(datetime.utcnow().timestamp()) * 1000
-
-
-def save_task_data(task_id: str, user_request: ImageGenerationRequest, response: ImageGenerationResponse):
-    app_name = firebase_settings.app_name
-    task_data = user_request.dict()
-    task_data.update(response.dict())
-    db.reference(app_name).child(task_id).set(task_data)
+    return int(datetime.utcnow().timestamp() * 1000)
 
 
 def update_response(task_id: str, response: ImageGenerationResponse):
-    app_name = firebase_settings.app_name
-    db.reference(app_name).child(task_id).update(response.dict())
+    db.reference(f"{app_name}/tasks/{task_id}").update(response.dict())
 
 
 def upload_output_images(task_id: str, results: List[ImageGenerationWorkerOutput]) -> Dict[str, ImageGenerationResult]:
-    app_name = firebase_settings.app_name
     ret: Dict[str, ImageGenerationResult] = {}
     bucket = storage.bucket()
     for result in results:
@@ -57,7 +52,6 @@ def upload_output_images(task_id: str, results: List[ImageGenerationWorkerOutput
         ret[file_name] = ImageGenerationResult(
             url=url, is_filtered=result.nsfw_content_detected, base_seed=result.base_seed, image_no=result.image_no
         )
-        os.remove(image_path)
 
         if result.origin_image_path is not None:
             origin_image_path = result.origin_image_path
@@ -66,8 +60,8 @@ def upload_output_images(task_id: str, results: List[ImageGenerationWorkerOutput
             origin_blob = bucket.blob(f"{app_name}/results/{task_id}/{origin_base_name}")
             origin_blob.upload_from_filename(origin_image_path)
             origin_blob.make_public()
-            origin_url = origin_blob.public_url
-            ret[file_name].origin_url = origin_url
-            os.remove(origin_image_path)
+            ret[file_name].origin_url = origin_blob.public_url
+
+    shutil.rmtree(os.path.join(model_settings.model_output_path, task_id), ignore_errors=True)
 
     return ret

@@ -7,14 +7,14 @@ import nvgpu
 import torch
 import torch.nn as nn
 from diffusers import DiffusionPipeline, StableDiffusionPipeline
-from PIL import Image
+from PIL import Image, ImageFilter
 from torch import autocast
 from transformers import CLIPConfig, CLIPVisionModel, PreTrainedModel
 
 from configs.config import model_settings
 from enums import ModelClassNameEnums
 from schemas import ImageGenerationRequest, ImageGenerationWorkerOutput
-from utils import clear_memory, get_random_string
+from utils import get_random_string
 
 
 def cosine_distance(image_embeds, text_embeds):
@@ -124,7 +124,7 @@ class TextToImageModel:
             base_seed_list: List[int] = []
             image_no_list: List[int] = []
             for seed in range(data.seed, data.seed + data.images):
-                seed = seed & 2147483647
+                seed = seed & 4294967295
                 generator = torch.cuda.manual_seed(seed)
                 with autocast("cuda"):
                     result = self.diffusion_pipeline(
@@ -144,7 +144,6 @@ class TextToImageModel:
                     filter_results.append(filter_result)
                     base_seed_list.append(seed)
                     image_no_list.append(1)
-                clear_memory()
         else:
             generator = torch.cuda.manual_seed(data.seed)
             with autocast("cuda"):
@@ -163,7 +162,6 @@ class TextToImageModel:
                     filter_results: List[bool] = [False] * len(images)
                 base_seed_list: List[int] = [data.seed] * len(images)
                 image_no_list: List[int] = [no for no in range(1, data.images + 1)]
-            clear_memory()
         output_path = os.path.join(model_settings.model_output_path, task_id)
         os.makedirs(output_path, exist_ok=True)
 
@@ -172,7 +170,7 @@ class TextToImageModel:
             random_string = get_random_string()
             if filter_results[i]:
                 images[i].save(os.path.join(output_path, f"{random_string}.png"))
-                images[i] = Image.new(mode="RGB", size=images[i].size)
+                images[i] = images[i].filter(ImageFilter.GaussianBlur(radius=45))
             images[i].save(os.path.join(output_path, f"{i + 1}.png"))
             result.append(
                 ImageGenerationWorkerOutput(
