@@ -32,7 +32,7 @@ docker run -d --name rabbitmq -p 5672:5672 -p 8080:15672 --restart=unless-stoppe
 ```
 git clone https://github.com/ainize-team/TTI-Worker.git
 cd TTI-Worker
-docker build -t celery-tti .
+docker build -t tti-celery .
 ```
 
 ### Create docker env file. Below is the sample
@@ -49,7 +49,7 @@ STORAGE_BUCKET=<firebase_storage_url>
 docker run -d --name <worker_container_name> \
 --gpus='"device=0"' --env-file <env filename> \
 -v <firebase_credential_dir_path>:/app/key -v <model_local_path>:/app/model \
-celery-tti
+tti-celery
 ```
 
 ### Test with FastAPI
