@@ -17,41 +17,36 @@ pip install -r requirements-dev.txt
 pre-commit install
 ```
 
-## Running the Celery worker server with RabbitMQ(as Broker) Firebase(as Backend).
-
-### Running RabbitMQ server using Docker
-
+## Installation
+1. Run RabbitMQ image as a broker
 ```shell
-docker run -d --name rabbitmq -p 5672:5672 -p 8080:15672 --restart=unless-stopped rabbitmq:3.9.21-management
+docker run -d --name tti-rabbitmq -p 5672:5672 -p 8080:15672 --restart=unless-stopped rabbitmq:3.9.21-management
 ```
 
-## 3-1. Using docker
-
-### Build docker file
-
-```
+2. Build docker image
+```shell
 git clone https://github.com/ainize-team/TTI-Worker.git
 cd TTI-Worker
-docker build -t tti-celery .
+docker build -t tti-worker .
 ```
 
-### Create docker env file. Below is the sample
-
-```
-BROKER_URI=<broker_uri>
-DATABASE_URL=<firebase_realtime_database_url>
-STORAGE_BUCKET=<firebase_storage_url>
-```
-
-### Run docker container
-
-```
+3. Run docker image
+```shell
 docker run -d --name <worker_container_name> \
---gpus='"device=0"' --env-file <env filename> \
--v <firebase_credential_dir_path>:/app/key -v <model_local_path>:/app/model \
-tti-celery
+--gpus='"device=0"' -e BROKER_URI=<broker_uri> \
+-e DATABASE_URL=<firebase_realtime_database_url> \
+-e STORAGE_BUCKET=<firebase_storage_url> \
+-v <firebase_credential_path>:/app/key -v <model_local_path>:/app/model \
+tti-worker
+```
+Or, you can use the [.env file](./.env.sample) to run as follows.
+```shell
+docker run -d --name <worker_container_name> \
+--gpus='"device=0"' \
+--env-file <env filename> \
+-v <firebase_credential_path>:/app/key -v <model_local_path>:/app/model \
+tti-worker
 ```
 
-### Test with FastAPI
-
+## Test with FastAPI
 - Check our [TTI-FastAPI](https://github.com/ainize-team/TTI-FastAPI) Repo.
