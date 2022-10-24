@@ -135,7 +135,7 @@ class TextToImageModel:
                         guidance_scale=data.guidance_scale,
                         num_inference_steps=data.steps,
                     )
-                    image: List[Image.Image] = result["sample"][0]
+                    image: List[Image.Image] = result["images"][0]
                     if "nsfw_content_detected" in result:
                         filter_result: bool = result["nsfw_content_detected"][0]
                     else:
@@ -155,7 +155,7 @@ class TextToImageModel:
                     guidance_scale=data.guidance_scale,
                     num_inference_steps=data.steps,
                 )
-                images: List[Image.Image] = result["sample"]
+                images: List[Image.Image] = result["images"]
                 if "nsfw_content_detected" in result:
                     filter_results: List[bool] = result["nsfw_content_detected"]
                 else:
