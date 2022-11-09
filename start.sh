@@ -1,3 +1,3 @@
 #!/bin/bash
 
-celery -A worker worker --loglevel=info --pool=solo --concurrency=1  --without-heartbeat
+celery -A worker worker -P threads --concurrency=1 -l INFO --without-heartbeat
