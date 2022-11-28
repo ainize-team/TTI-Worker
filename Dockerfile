@@ -1,30 +1,37 @@
-FROM nvidia/cuda:11.3.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu20.04
 
 # set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    DEBIAN_FRONTEND=noninteractive
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    DEBIAN_FRONTEND=noninteractive 
 
-RUN apt-get update \
-    && apt remove python-pip  python3-pip \
-    && apt-get install --no-install-recommends -y \
-    build-essential \
+ENV PATH="$POETRY_HOME/bin:$VIRTUAL_ENVIRONMENT_PATH/bin:$PATH"
+
+# Install Python3.8, poetry and redis-server
+RUN apt-get update && \
+    apt remove python-pip python3-pip && \
+    apt-get install --no-install-recommends -y \
+    redis-server \
     ca-certificates \
-    curl \
     g++ \
     python3.8 \
     python3.8-dev \
     python3.8-distutils \
-    && rm -rf /var/lib/apt/lists/* \
-    && cd /tmp \
-    && curl -O https://bootstrap.pypa.io/get-pip.py \
-    && python3.8 get-pip.py \
-    && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 \
-    && update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3.8 1
+    curl && \
+    rm -rf /var/lib/apt/lists/* && \
+    cd /tmp && \
+    curl -O https://bootstrap.pypa.io/get-pip.py && \
+    python3.8 get-pip.py && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 && \
+    update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3.8 1 && \
+    curl -sSL https://install.python-poetry.org | python3 -
 
 WORKDIR /app
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install -r requirements.txt
+COPY ./pyproject.toml ./pyproject.toml
+COPY ./poetry.lock ./poetry.lock
+RUN poetry install --only main
 
 COPY ./src/ /app/
 
