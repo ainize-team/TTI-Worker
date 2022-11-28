@@ -6,13 +6,13 @@ import numpy as np
 import nvgpu
 import torch
 import torch.nn as nn
-from diffusers import DiffusionPipeline, StableDiffusionPipeline
+from diffusers import DiffusionPipeline, EulerDiscreteScheduler, StableDiffusionPipeline
 from PIL import Image, ImageFilter
 from torch import autocast
 from transformers import CLIPConfig, CLIPVisionModel, PreTrainedModel
 
 from configs.config import model_settings
-from enums import ModelClassNameEnums
+from enums import ModelTypeEnums
 from schemas import ImageGenerationRequest, ImageGenerationWorkerOutput
 from utils import get_random_string
 
@@ -85,7 +85,14 @@ class TextToImageModel:
 
     def load_model(self) -> None:
         if torch.cuda.is_available():
-            if model_settings.model_class_name == ModelClassNameEnums.STABLE_DIFFUSION:
+            if model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V2:
+                scheduler = EulerDiscreteScheduler.from_pretrained(
+                    model_settings.model_name_or_path, subfolder="scheduler"
+                )
+                self.diffusion_pipeline = StableDiffusionPipeline.from_pretrained(
+                    model_settings.model_name_or_path, scheduler=scheduler, revision="fp16", torch_dtype=torch.float16
+                ).to("cuda")
+            elif model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V1:
                 self.diffusion_pipeline = StableDiffusionPipeline.from_pretrained(
                     model_settings.model_name_or_path, torch_dtype=torch.float16
                 ).to("cuda")
@@ -96,6 +103,7 @@ class TextToImageModel:
                 self.diffusion_pipeline = DiffusionPipeline.from_pretrained(
                     model_settings.model_name_or_path, torch_dtype=torch.float16
                 ).to("cuda")
+            self.diffusion_pipeline.pipe.enable_attention_slicing()
         else:
             logger.error("CPU Mode is not Supported")
             exit(1)
