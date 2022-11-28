@@ -12,3 +12,34 @@ lines_after_imports = 2
 multi_line_output = 3
 use_parentheses = true
 
+[tool.poetry]
+name = "TTI-Worker"
+version = "0.3.0"
+description = ""
+authors = ["YoungJae Kim <byeongal@comcom.ai>", "DongHoon Baek<baek@comcom.ai>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+torch = "^1.13.0"
+transformers = "^4.24.0"
+datasets = "^2.7.0"
+pydantic = "^1.10.2"
+accelerate = "^0.14.0"
+diffusers = "^0.9.0"
+torchvision = "^0.14.0"
+loguru = "^0.6.0"
+celery = "^5.2.7"
+firebase-admin = "^6.0.1"
+nvgpu = "^0.9.0"
+xformers = "^0.0.13"
+
+[tool.poetry.dev-dependencies]
+black = "^22.6.0"
+flake8 = "^5.0.4"
+isort = "^5.10.1"
+pre-commit = "^2.20.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
