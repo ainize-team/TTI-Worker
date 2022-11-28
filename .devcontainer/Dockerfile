@@ -4,22 +4,34 @@ FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu20.04
 ENV \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
     DEBIAN_FRONTEND=noninteractive  \
-    PROJECT_NAME="TTI-Worker"
+    CONDA_MIRROR=https://github.com/conda-forge/miniforge/releases/latest/download  \
+    CONDA_DIR=/opt/conda \
+    CONDA_ROOT=/opt/conda
 
-ENV PATH="$POETRY_HOME/bin:/workspaces/$PROJECT_NAME/.venv/bin:$PATH"
+ENV PATH="${CONDA_DIR}/bin:${PATH}"
 
-# Install Poetry
-# https://python-poetry.org/docs/#osx--linux--bashonwindows-install-instructions
+# Install Ubuntu Package
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     build-essential \
-    curl \
+    wget \
     git \
-    openssh-client \
-    python3 \
-    python3-dev \
-    python3-pip  && \
-    curl -sSL https://install.python-poetry.org | python3 -
+    openssh-client 
+
+RUN set -x && \
+    # Miniforge installer
+    miniforge_arch=$(uname -m) && \
+    miniforge_installer="Mambaforge-Linux-${miniforge_arch}.sh" && \
+    wget --quiet "${CONDA_MIRROR}/${miniforge_installer}" && \
+    /bin/bash "${miniforge_installer}" -f -b -p "${CONDA_DIR}" && \
+    rm "${miniforge_installer}" && \
+    # Conda configuration see https://conda.io/projects/conda/en/latest/configuration.html
+    conda config --system --set auto_update_conda false && \
+    conda config --system --set show_channel_urls true && \
+    mamba install --quiet --yes python=3.9 && \
+    # Pin major.minor version of python
+    mamba list python | grep '^python ' | tr -s ' ' | cut -d ' ' -f 1,2 >> "${CONDA_DIR}/conda-meta/pinned" && \
+    # Using conda to update all packages: https://github.com/mamba-org/mamba/issues/1092
+    conda update --all --quiet --yes && \
+    conda clean --all -f -y

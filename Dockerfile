@@ -1,37 +1,45 @@
 FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu20.04
 
 # set environment variables
-ENV PYTHONUNBUFFERED=1 \
+ENV \
+    PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    DEBIAN_FRONTEND=noninteractive 
+    DEBIAN_FRONTEND=noninteractive  \
+    CONDA_MIRROR=https://github.com/conda-forge/miniforge/releases/latest/download  \
+    CONDA_DIR=/opt/conda \
+    CONDA_ROOT=/opt/conda
 
-ENV PATH="$POETRY_HOME/bin:$VIRTUAL_ENVIRONMENT_PATH/bin:$PATH"
+ENV PATH="${CONDA_DIR}/bin:${PATH}"
 
-# Install Python3.8, poetry and redis-server
-RUN apt-get update && \
-    apt remove python-pip python3-pip && \
-    apt-get install --no-install-recommends -y \
-    redis-server \
-    ca-certificates \
-    g++ \
-    python3.8 \
-    python3.8-dev \
-    python3.8-distutils \
-    curl && \
-    rm -rf /var/lib/apt/lists/* && \
-    cd /tmp && \
-    curl -O https://bootstrap.pypa.io/get-pip.py && \
-    python3.8 get-pip.py && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 && \
-    update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3.8 1 && \
-    curl -sSL https://install.python-poetry.org | python3 -
+# Install Ubuntu Package
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+    build-essential \
+    wget \
+    git \
+    openssh-client 
+
+RUN set -x && \
+    # Miniforge installer
+    miniforge_arch=$(uname -m) && \
+    miniforge_installer="Mambaforge-Linux-${miniforge_arch}.sh" && \
+    wget --quiet "${CONDA_MIRROR}/${miniforge_installer}" && \
+    /bin/bash "${miniforge_installer}" -f -b -p "${CONDA_DIR}" && \
+    rm "${miniforge_installer}" && \
+    # Conda configuration see https://conda.io/projects/conda/en/latest/configuration.html
+    conda config --system --set auto_update_conda false && \
+    conda config --system --set show_channel_urls true && \
+    mamba install --quiet --yes python=3.9 && \
+    # Pin major.minor version of python
+    mamba list python | grep '^python ' | tr -s ' ' | cut -d ' ' -f 1,2 >> "${CONDA_DIR}/conda-meta/pinned" && \
+    # Using conda to update all packages: https://github.com/mamba-org/mamba/issues/1092
+    conda update --all --quiet --yes && \
+    conda clean --all -f -y
 
 WORKDIR /app
-COPY ./pyproject.toml ./pyproject.toml
-COPY ./poetry.lock ./poetry.lock
-RUN poetry install --only main
+COPY environment.yml ./environment.yml
+RUN mamba env update --name root --file environment.yml && \
+    rm environment.yml
 
 COPY ./src/ /app/
 

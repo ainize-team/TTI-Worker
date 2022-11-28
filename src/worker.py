@@ -8,7 +8,7 @@ from configs.config import celery_worker_settings, firebase_settings
 
 app = Celery(
     celery_worker_settings.worker_name,
-    broker=celery_worker_settings.broker_uri,
+    broker=f"{celery_worker_settings.broker_base_uri}/{celery_worker_settings.vhost_name}",
     include=["tasks"],
 )
 app.config_from_object(celery_config)

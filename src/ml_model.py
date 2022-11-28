@@ -87,10 +87,10 @@ class TextToImageModel:
         if torch.cuda.is_available():
             if model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V2:
                 scheduler = EulerDiscreteScheduler.from_pretrained(
-                    model_settings.model_name_or_path, subfolder="scheduler"
+                   model_settings.model_name_or_path, subfolder="scheduler"
                 )
                 self.diffusion_pipeline = StableDiffusionPipeline.from_pretrained(
-                    model_settings.model_name_or_path, scheduler=scheduler, revision="fp16", torch_dtype=torch.float16
+                    model_settings.model_name_or_path, scheduler=scheduler, torch_dtype=torch.float16
                 ).to("cuda")
             elif model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V1:
                 self.diffusion_pipeline = StableDiffusionPipeline.from_pretrained(
@@ -103,7 +103,8 @@ class TextToImageModel:
                 self.diffusion_pipeline = DiffusionPipeline.from_pretrained(
                     model_settings.model_name_or_path, torch_dtype=torch.float16
                 ).to("cuda")
-            self.diffusion_pipeline.pipe.enable_attention_slicing()
+            self.diffusion_pipeline.enable_xformers_memory_efficient_attention()
+            
         else:
             logger.error("CPU Mode is not Supported")
             exit(1)

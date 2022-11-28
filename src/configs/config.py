@@ -5,7 +5,8 @@ from enums import ModelTypeEnums
 
 class CeleryWorkerSettings(BaseSettings):
     worker_name: str = "Celery Worker"
-    broker_uri: str = "amqp://guest:guest@localhost:5672//"
+    broker_base_uri: str = "amqp://guest:guest@localhost:5672/"
+    vhost_name: str = "stable-diffusion-v2"
 
 
 class ModelSettings(BaseSettings):
