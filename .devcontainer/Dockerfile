@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu20.04
+FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu20.04
 
 # set environment variables
 ENV \
@@ -35,15 +35,3 @@ RUN set -x && \
     # Using conda to update all packages: https://github.com/mamba-org/mamba/issues/1092
     conda update --all --quiet --yes && \
     conda clean --all -f -y
-
-WORKDIR /app
-COPY environment.yml ./environment.yml
-RUN mamba env update --name root --file environment.yml && \
-    rm environment.yml
-
-COPY ./src/ /app/
-
-COPY ./start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
-CMD ./start.sh

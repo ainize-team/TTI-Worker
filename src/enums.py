@@ -3,10 +3,10 @@ from enum import Enum
 
 class StrEnum(str, Enum):
     def __repr__(self):
-        return self.name
+        return self.value
 
     def __str__(self):
-        return self.name
+        return self.value
 
 
 class IntEnum(int, Enum):
@@ -26,7 +26,6 @@ class ResponseStatusEnum(StrEnum):
 
 class EnvEnum(StrEnum):
     DEV: str = "dev"
-    STAGGING: str = "stagging"
     PROD: str = "prod"
 
 
@@ -35,6 +34,7 @@ class ErrorStatusEnum(IntEnum):
     INTERNAL_SERVER_ERROR = 500
 
 
-class ModelClassNameEnums(StrEnum):
-    STABLE_DIFFUSION: str = "StableDiffusionPipeline"
-    LDM_TEXT_TO_IMAGE: str = "LDMTextToImagePipeline"
+class ModelTypeEnums(StrEnum):
+    STABLE_DIFFUSION_V1: str = "STABLE_DIFFUSION_V1"
+    STABLE_DIFFUSION_V2: str = "STABLE_DIFFUSION_V2"
+    LDM_TEXT_TO_IMAGE: str = "LDM_TEXT_TO_IMAGE"

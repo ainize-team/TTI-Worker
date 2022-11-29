@@ -1,15 +1,16 @@
 from pydantic import BaseSettings, Field
 
-from enums import ModelClassNameEnums
+from enums import ModelTypeEnums
 
 
 class CeleryWorkerSettings(BaseSettings):
     worker_name: str = "Celery Worker"
-    broker_uri: str = "amqp://guest:guest@localhost:5672//"
+    broker_base_uri: str = "amqp://guest:guest@localhost:5672/"
+    vhost_name: str = "stable-diffusion-v2"
 
 
 class ModelSettings(BaseSettings):
-    model_class_name: ModelClassNameEnums = ModelClassNameEnums.STABLE_DIFFUSION
+    model_type: ModelTypeEnums = ModelTypeEnums.STABLE_DIFFUSION_V2
     model_name_or_path: str = "./model"
     model_output_path: str = "./outputs"
     model_unit_memory: int = Field(default=3072, description="Memory Required to Create an Image 512 by 512")
