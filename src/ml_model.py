@@ -72,7 +72,6 @@ class TextToImageModel:
     def __init__(self):
         self.model: Union[DiffusionPipeline, None] = None
         os.makedirs(model_settings.model_output_path, exist_ok=True)
-        self.load_model()
 
     def load_model(self) -> None:
         if torch.cuda.is_available():
