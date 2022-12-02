@@ -10,6 +10,10 @@ class ImageGenerationRequest(BaseModel):
         ...,
         description="try adding increments to your prompt such as 'oil on canvas', 'a painting', 'a book cover'",
     )
+    negative_prompt: Optional[str] = Field(
+        None,
+        description="add image feature that you want to remove on your generated image",
+    ) 
     steps: int = Field(
         default=45, ge=1, le=100, description="more steps can increase quality but will take longer to generate"
     )
