@@ -20,7 +20,6 @@ def load_model(**kwargs):
     tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
     logger.info("Start loading model...")
     tti.load_model()
-    tti.load_clip_model()
     logger.info("Loading model is done!")
 
 

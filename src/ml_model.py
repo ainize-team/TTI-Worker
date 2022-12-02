@@ -70,10 +70,13 @@ class CustomStableDiffusionSafetyChecker(StableDiffusionSafetyChecker):
 
 class TextToImageModel:
     def __init__(self):
-        self.model: Union[DiffusionPipeline, None] = None
+        self.diffusion_pipeline: Union[DiffusionPipeline, None] = None
         os.makedirs(model_settings.model_output_path, exist_ok=True)
 
     def load_model(self) -> None:
+        if self.diffusion_pipeline is not None:
+            return
+
         if torch.cuda.is_available():
             if model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V2:
                 scheduler = EulerDiscreteScheduler.from_pretrained(
@@ -109,6 +112,9 @@ class TextToImageModel:
             exit(1)
 
     def generate(self, task_id: str, data: ImageGenerationRequest) -> List[ImageGenerationWorkerOutput]:
+        if self.diffusion_pipeline is None:
+            raise Exception("Model is not loaded completly.")
+
         def make_grid(images: List[Image.Image]):
             rows = 1
             cols = len(images)
@@ -126,6 +132,7 @@ class TextToImageModel:
             with autocast("cuda"):
                 result = self.diffusion_pipeline(
                     prompt=[data.prompt] * data.images,
+                    negative_prompt=[data.negative_prompt] * data.images,
                     generator=generator,
                     height=data.height,
                     width=data.width,
