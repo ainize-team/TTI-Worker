@@ -76,7 +76,7 @@ class TextToImageModel:
     def load_model(self) -> None:
         if self.diffusion_pipeline is not None:
             return
-        
+
         if torch.cuda.is_available():
             if model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V2:
                 scheduler = EulerDiscreteScheduler.from_pretrained(
@@ -114,7 +114,7 @@ class TextToImageModel:
     def generate(self, task_id: str, data: ImageGenerationRequest) -> List[ImageGenerationWorkerOutput]:
         if self.diffusion_pipeline is None:
             raise Exception("Model is not loaded completly.")
-        
+
         def make_grid(images: List[Image.Image]):
             rows = 1
             cols = len(images)
