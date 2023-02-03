@@ -9,20 +9,6 @@ ENV \
     PROJECT_NAME="TTI-Worker" \
     DEBIAN_FRONTEND=noninteractive
 
-# Generate and Set locals
-RUN \
-    apt-get update && \
-    apt-get install -y locales && \
-    # install locales-all?
-    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen && \
-    dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale LANG=en_US.UTF-8
-
-ENV LC_ALL="en_US.UTF-8" \
-    LANG="en_US.UTF-8" \
-    LANGUAGE="en_US:en"
-
 RUN apt-get update \
     && apt remove python-pip  python3-pip \
     && apt-get install --no-install-recommends -y \
@@ -36,6 +22,7 @@ RUN apt-get update \
     git \
     wget \
     curl \
+    openssh-client \
     && rm -rf /var/lib/apt/lists/* \
     && cd /tmp \
     && curl -O https://bootstrap.pypa.io/get-pip.py \
