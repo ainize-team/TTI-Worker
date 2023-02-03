@@ -6,7 +6,7 @@ ENV \
     PYTHONDONTWRITEBYTECODE=1 \
     POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
-    VIRTUAL_ENVIRONMENT_PATH="/app/.venv"
+    VIRTUAL_ENVIRONMENT_PATH="/app/.venv" \
     DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
