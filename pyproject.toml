@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 119
-target-version = ["py38"]
+target-version = ["py39"]
 
 [tool.isort]
 ensure_newline_before_comments = true
@@ -11,3 +11,36 @@ line_length = 119
 lines_after_imports = 2
 multi_line_output = 3
 use_parentheses = true
+
+
+[tool.poetry]
+name = "TTI-Worker"
+version = "0.5.0"
+description = ""
+authors = ["Jibaek Lim <jibaek@comcom.ai>", "YoungJae Kim <byeongal@comcom.ai>", "DongHoon Baek <baek@comcom.ai>", "Heewon Shin <heewon@comcom.ai>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9,<3.12"
+torch = "^1.13.1"
+torchvision = "^0.14.1"
+diffusers = "^0.12.1"
+transformers = "^4.26.0"
+scipy = "^1.10.0"
+ftfy = "^6.1.1"
+accelerate = "^0.16.0"
+pydantic = "^1.10.4"
+celery = "^5.2.7"
+loguru = "^0.6.0"
+firebase-admin = "^6.1.0"
+xformers = "^0.0.16"
+
+[tool.poetry.dev-dependencies]
+black = "^23.1.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+pre-commit = "^3.0.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

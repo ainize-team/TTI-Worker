@@ -4,13 +4,23 @@ from typing import List, Union
 
 import torch
 import torch.nn as nn
-from diffusers import DiffusionPipeline, EulerDiscreteScheduler, StableDiffusionPipeline
+from diffusers import DiffusionPipeline
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
+from diffusers.schedulers import (
+    DDIMScheduler,
+    EulerAncestralDiscreteScheduler,
+    EulerDiscreteScheduler,
+    HeunDiscreteScheduler,
+    KDPM2AncestralDiscreteScheduler,
+    KDPM2DiscreteScheduler,
+    LMSDiscreteScheduler,
+    PNDMScheduler,
+)
 from PIL import Image, ImageFilter
 from torch import autocast
 
 from configs.config import model_settings
-from enums import ModelTypeEnums
+from enums import SchedulerType
 from schemas import ImageGenerationRequest, ImageGenerationWorkerOutput
 from utils import get_random_string
 
@@ -78,35 +88,39 @@ class TextToImageModel:
             return
 
         if torch.cuda.is_available():
-            if model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V2:
-                scheduler = EulerDiscreteScheduler.from_pretrained(
-                    model_settings.model_name_or_path, subfolder="scheduler"
-                )
-                safety_checker = CustomStableDiffusionSafetyChecker.from_pretrained(
-                    os.path.join(model_settings.model_name_or_path, "safety_checker"), torch_dtype=torch.float16
-                )
-                self.diffusion_pipeline = StableDiffusionPipeline.from_pretrained(
-                    model_settings.model_name_or_path,
-                    scheduler=scheduler,
-                    torch_dtype=torch.float16,
-                    safety_checker=safety_checker,
-                ).to("cuda")
-
-            elif model_settings.model_type == ModelTypeEnums.STABLE_DIFFUSION_V1:
-                safety_checker = CustomStableDiffusionSafetyChecker.from_pretrained(
-                    os.path.join(model_settings.model_name_or_path, "safety_checker"), torch_dtype=torch.float16
-                )
-                self.diffusion_pipeline = StableDiffusionPipeline.from_pretrained(
-                    model_settings.model_name_or_path,
-                    torch_dtype=torch.float16,
-                    safety_checker=safety_checker,
-                ).to("cuda")
-            else:
-                self.diffusion_pipeline = DiffusionPipeline.from_pretrained(
-                    model_settings.model_name_or_path, torch_dtype=torch.float16
-                ).to("cuda")
+            safety_checker = CustomStableDiffusionSafetyChecker.from_pretrained(
+                os.path.join(model_settings.model_name_or_path, "safety_checker"), torch_dtype=torch.float16
+            )
+            self.diffusion_pipeline = DiffusionPipeline.from_pretrained(
+                model_settings.model_name_or_path,
+                torch_dtype=torch.float16,
+                safety_checker=safety_checker,
+            ).to("cuda")
             self.diffusion_pipeline.enable_xformers_memory_efficient_attention()
-
+            self.dimm_scheduler = DDIMScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
+            self.pndm_scheduler = PNDMScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
+            self.euler_discrete_scheduler = EulerDiscreteScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
+            self.euler_ancestral_discrete_scheduler = EulerAncestralDiscreteScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
+            self.heun_discrete_scheduler = HeunDiscreteScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
+            self.k_dpm_2_discrete_scheduler = KDPM2DiscreteScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
+            self.k_dpm_2_ancestral_discrete_scheduler = KDPM2AncestralDiscreteScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
+            self.lms_discrete_scheduler = LMSDiscreteScheduler.from_pretrained(
+                model_settings.model_name_or_path, subfolder="scheduler"
+            )
         else:
             logger.error("CPU Mode is not Supported")
             exit(1)
@@ -128,6 +142,23 @@ class TextToImageModel:
             return grid
 
         generator = torch.cuda.manual_seed(data.seed)
+
+        if data.scheduler_type == SchedulerType.DDIM:
+            self.diffusion_pipeline.scheduler = self.dimm_scheduler
+        elif data.scheduler_type == SchedulerType.PNDM:
+            self.diffusion_pipeline.scheduler = self.pndm_scheduler
+        elif data.scheduler_type == SchedulerType.EULER_DISCRETE:
+            self.diffusion_pipeline.scheduler = self.euler_discrete_scheduler
+        elif data.scheduler_type == SchedulerType.EULER_ANCESTRAL_DISCRETE:
+            self.diffusion_pipeline.scheduler = self.euler_ancestral_discrete_scheduler
+        elif data.scheduler_type == SchedulerType.HEUN_DISCRETE:
+            self.diffusion_pipeline.scheduler = self.heun_discrete_scheduler
+        elif data.scheduler_type == SchedulerType.K_DPM_2_DISCRETE:
+            self.diffusion_pipeline.scheduler = self.k_dpm_2_discrete_scheduler
+        elif data.scheduler_type == SchedulerType.K_DPM_2_ANCESTRAL_DISCRETE:
+            self.diffusion_pipeline.scheduler = self.k_dpm_2_ancestral_discrete_scheduler
+        elif data.scheduler_type == SchedulerType.LMS_DISCRETE:
+            self.diffusion_pipeline.scheduler = self.lms_discrete_scheduler
         with torch.inference_mode():
             with autocast("cuda"):
                 result = self.diffusion_pipeline(

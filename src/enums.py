@@ -34,7 +34,12 @@ class ErrorStatusEnum(IntEnum):
     INTERNAL_SERVER_ERROR = 500
 
 
-class ModelTypeEnums(StrEnum):
-    STABLE_DIFFUSION_V1: str = "STABLE_DIFFUSION_V1"
-    STABLE_DIFFUSION_V2: str = "STABLE_DIFFUSION_V2"
-    LDM_TEXT_TO_IMAGE: str = "LDM_TEXT_TO_IMAGE"
+class SchedulerType(StrEnum):
+    DDIM: str = "ddim"  # DDIMScheduler
+    PNDM: str = "pndm"  # PNDMScheduler
+    EULER_DISCRETE = "euler_discrete"  # EulerDiscreteScheduler
+    EULER_ANCESTRAL_DISCRETE = "euler_ancestral_discrete"  # EulerAncestralDiscreteScheduler
+    HEUN_DISCRETE = "heun_discrete"  # HeunDiscreteScheduler
+    K_DPM_2_DISCRETE = "k_dpm_2_discrete"  # KDPM2DiscreteScheduler
+    K_DPM_2_ANCESTRAL_DISCRETE = "k_dpm_2_ancestral_discrete"  # KDPM2AncestralDiscreteScheduler
+    LMS_DISCRETE = "lms_discrete"  # LMSDiscreteScheduler

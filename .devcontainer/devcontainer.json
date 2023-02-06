@@ -11,6 +11,9 @@
 			"extensions":  ["ms-python.python", "VisualStudioExptTeam.vscodeintellicode", "streetsidesoftware.code-spell-checker"]
 		}
 	},
-	"postCreateCommand": "mamba env update --name root --file environment.yml"
+	"postCreateCommand": "poetry install",
+	"mounts": [
+        "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+    ]
 }
 
