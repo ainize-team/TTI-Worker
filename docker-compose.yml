@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  stable-diffusion-v2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stable-diffuion-v2-worker
+    env_file:
+      - .env
+    environment:
+      - VHOST_NAME=stable-diffusion-v2
+    volumes:
+      - <firebase_credential_path>:/app/key
+      - <model_local_path>:/app/model
+    networks:
+      - tti-fastapi_dev
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+
+  stable-diffusion-v2-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stable-diffuion-v2-1-worker
+    env_file:
+      - .env
+    environment:
+      - VHOST_NAME=stable-diffusion-v2-1
+    volumes:
+      - <firebase_credential_path>:/app/key
+      - <model_local_path>:/app/model
+    networks:
+      - tti-fastapi_dev
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['1']
+              capabilities: [gpu]
+
+networks:
+  tti-fastapi_dev:
+    external: true
