@@ -15,8 +15,8 @@ class ModelSettings(BaseSettings):
 
 class FirebaseSettings(BaseSettings):
     cred_path: str = "/app/key/serviceAccountKey.json"
-    database_url: str
-    storage_bucket: str
+    firebase_database_url: str
+    firebase_storage_bucket: str
     app_name: str = "text-to-art"
 
 

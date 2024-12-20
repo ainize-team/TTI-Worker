@@ -13,7 +13,7 @@ from configs.config import firebase_settings, model_settings
 from schemas import ImageGenerationResponse, ImageGenerationResult, ImageGenerationWorkerOutput
 
 
-app_name = firebase_settings.app_name
+app_name = firebase_settings.firebase_app_name
 
 
 def clear_memory() -> None:

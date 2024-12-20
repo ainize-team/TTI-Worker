@@ -2,9 +2,7 @@ version: '3'
 
 services:
   stable-diffusion-v2:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: devainetwork/tti-worker
     container_name: stable-diffuion-v2-worker
     env_file:
       - .env
@@ -25,9 +23,7 @@ services:
               capabilities: [gpu]
 
   stable-diffusion-v2-1:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: devainetwork/tti-worker
     container_name: stable-diffuion-v2-1-worker
     env_file:
       - .env
