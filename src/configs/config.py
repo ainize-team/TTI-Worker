@@ -17,7 +17,7 @@ class FirebaseSettings(BaseSettings):
     cred_path: str = "/app/key/serviceAccountKey.json"
     firebase_database_url: str
     firebase_storage_bucket: str
-    app_name: str = "text-to-art"
+    firebase_app_name: str = "text-to-art"
 
 
 celery_worker_settings = CeleryWorkerSettings()

@@ -46,8 +46,8 @@ docker build -t tti-worker .
 ```shell
 docker run -d --name <worker_container_name> \
 --gpus='"device=0"' -e BROKER_URI=<broker_uri> \
--e DATABASE_URL=<firebase_realtime_database_url> \
--e STORAGE_BUCKET=<firebase_storage_url> \
+-e FIREBASE_DATABASE_URL=<firebase_realtime_database_url> \
+-e FIREBASE_STORAGE_BUCKET=<firebase_storage_url> \
 -v <firebase_credential_path>:/app/key -v <model_local_path>:/app/model \
 tti-worker
 ```
